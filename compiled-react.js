@@ -1,112 +1,62 @@
 'use strict';
 
-const scaleNames = {
-    c: 'Celsius',
-    f: 'Fahrenheit'
-};
-
-function toCelsius(fahrenheit) {
-    return (fahrenheit - 32) * 5 / 9;
-}
-
-function toFahrenheit(celsius) {
-    return celsius * 9 / 5 + 32;
-}
-
-function tryConvert(value, convert) {
-    const input = parseFloat(value);
-    if (Number.isNaN(input)) {
-        return '';
-    }
-
-    const output = convert(input);
-    const rounded = Math.round(output * 1000) / 1000;
-    return rounded.toString();
-}
-
-function BoilingVerdict(props) {
-    if (props.celsius >= 100) {
-        return React.createElement(
-            'p',
-            null,
-            'The water would boil.'
-        );
-    }
+function FancyBorder(props) {
     return React.createElement(
-        'p',
-        null,
-        'The water would not boil.'
+        'div',
+        { className: 'FancyBorder FancyBorder-' + props.color },
+        props.children
     );
 }
 
-class TemperatureInput extends React.Component {
+function Dialog(props) {
+    return React.createElement(
+        FancyBorder,
+        { color: 'blue' },
+        React.createElement(
+            'h1',
+            { className: 'Dialog-title' },
+            props.title
+        ),
+        React.createElement(
+            'p',
+            { className: 'Dialg-message' },
+            props.message
+        ),
+        props.children
+    );
+}
+
+class SignUpDialog extends React.Component {
     constructor(props) {
         super(props);
         this.handleChange = this.handleChange.bind(this);
-        this.state = { value: '' };
+        this.handleSignUp = this.handleSignUp.bind(this);
+        this.state = { login: '' };
+    }
+
+    render() {
+        return React.createElement(
+            Dialog,
+            {
+                title: 'Welcome',
+                message: 'Thank you for visiting our spacecraft!' },
+            React.createElement('input', { value: this.state.login,
+                onChange: this.handleChange }),
+            React.createElement(
+                'button',
+                { onClick: this.handleSignUp },
+                'Sign Me Up!'
+            )
+        );
     }
 
     handleChange(e) {
-        this.props.onChange(e.target.value);
+        this.setState({ login: e.target.value });
     }
 
-    render() {
-        const value = this.props.value;
-        const scale = this.props.scale;
-        return React.createElement(
-            'fieldset',
-            null,
-            React.createElement(
-                'legend',
-                null,
-                'Enter temperature in ',
-                scaleNames[scale],
-                ':'
-            ),
-            React.createElement('input', {
-                value: value,
-                onChange: this.handleChange })
-        );
+    handleSignUp() {
+        alert(`Welcome aboard, ${ this.state.login }!`);
     }
 }
 
-class Calculator extends React.Component {
-    constructor(props) {
-        super(props);
-        this.handleCelsiusChange = this.handleCelsiusChange.bind(this);
-        this.handleFahrenheitChange = this.handleFahrenheitChange.bind(this);
-        this.state = { value: '', scale: 'c' };
-    }
-
-    handleCelsiusChange(value) {
-        this.setState({ scale: 'c', value });
-    }
-
-    handleFahrenheitChange(value) {
-        this.setState({ scale: 'f', value });
-    }
-
-    render() {
-        const scale = this.state.scale;
-        const value = this.state.value;
-        const celsius = scale === 'f' ? tryConvert(value, toCelsius) : value;
-        const fahrenheit = scale === 'c' ? tryConvert(value, toFahrenheit) : value;
-
-        return React.createElement(
-            'div',
-            null,
-            React.createElement(TemperatureInput, {
-                scale: 'c',
-                value: celsius,
-                onChange: this.handleCelsiusChange }),
-            React.createElement(TemperatureInput, {
-                scale: 'f',
-                value: fahrenheit,
-                onChange: this.handleFahrenheitChange }),
-            React.createElement(BoilingVerdict, {
-                celsius: parseFloat(celsius) })
-        );
-    }
-}
-
-ReactDOM.render(React.createElement(Calculator, null), document.getElementById('root'));
+ReactDOM.render(React.createElement(SignUpDialog, null), document.getElementById('root'));
